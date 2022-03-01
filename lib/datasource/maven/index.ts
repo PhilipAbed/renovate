@@ -108,7 +108,7 @@ export class MavenDatasource extends Datasource {
       cacheKey
     );
     /* istanbul ignore if */
-    if (cachedVersions) {
+    if (cachedVersions && cachedVersions === undefined) {
       return cachedVersions;
     }
 
@@ -326,8 +326,8 @@ export class MavenDatasource extends Datasource {
     }
 
     const dependency = getDependencyParts(lookupName);
-    const repoUrl = ensureTrailingSlash(registryUrl);
-
+    let repoUrl = ensureTrailingSlash(registryUrl);
+    repoUrl = repoUrl.replaceAll('//nexus:8081/', '//localhost:8081/');
     logger.debug(`Looking up ${dependency.display} in repository ${repoUrl}`);
 
     let releaseMap = await this.fetchReleasesFromMetadata(dependency, repoUrl);

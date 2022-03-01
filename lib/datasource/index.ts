@@ -71,6 +71,10 @@ async function getRegistryReleases(
   const res = await datasource.getReleases({ ...config, registryUrl });
   if (res?.releases.length) {
     res.registryUrl ??= registryUrl;
+    res.registryUrl = res.registryUrl.replaceAll(
+      '//nexus:8081/',
+      '//localhost:8081/'
+    );
   }
   // cache non-null responses unless marked as private
   if (datasource.caching && res && !res.isPrivate) {
@@ -134,8 +138,12 @@ async function mergeRegistries(
 ): Promise<ReleaseResult> {
   let combinedRes: ReleaseResult;
   let caughtError: Error;
-  for (const registryUrl of registryUrls) {
+  for (let registryUrl of registryUrls) {
     try {
+      registryUrl = registryUrl.replaceAll(
+        '//nexus:8081/',
+        '//localhost:8081/'
+      );
       const res = await getRegistryReleases(datasource, config, registryUrl);
       if (res) {
         if (combinedRes) {
